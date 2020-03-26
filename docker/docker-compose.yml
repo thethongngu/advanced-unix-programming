@@ -1,0 +1,24 @@
+version: '2'
+
+services:
+  main:
+    container_name: ubuntu
+    build: .
+    restart: unless-stopped
+    cap_add:
+      - ALL
+    ports:
+      - "20022:22"
+    environment:
+      - EDITOR=vim
+    volumes:
+      - //d/project/unix-code:/home
+    privileged: true
+    networks:
+        default:
+        internal:
+
+networks:
+    default:
+    internal:
+        internal: true
