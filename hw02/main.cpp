@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include <dlfcn.h>
 #include <sys/types.h>
+#include <fcntl.h>
 
 #include "utils.h"
 
@@ -53,10 +54,28 @@ static void init() __attribute__((constructor));
 void init() {
     void *handle = dlopen(so_path.c_str(), RTLD_LAZY);
     static auto a = reinterpret_cast<int (*)(const char*, mode_t)>(dlsym(handle, "mkdir"));
-    a("a", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+//    a("a", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 }
 
 int main(int argc, char **argv) {
     get_arguments(argc, argv);
-//    system("mkdir");
+
+    char *newargv[] = { "/usr/bin/mkdir a", nullptr };
+//    char *newenviron[] = { BY_LAUCHER, nullptr };
+
+//    int fd = open("~/Desktop/test.log", O_CREAT|O_WRONLY, 0600);
+//    dup2(fd, 1);
+//    dup2(fd, 2);
+//    close(fd);
+
+//    extern char **environ;
+//    char **new_envp = copyenv(environ);
+
+//    putenv(BY_LAUCHER);
+//    execvpe("/usr/bin/mkdir", newargv, new_envp);
+//    execve("mkdir", newargv);
+
+    system("mkdir");
+
+//    execvp("mkdir", reinterpret_cast<char *const *>("a"));
 }
