@@ -2,6 +2,7 @@
 // Created by thong on 5/11/20.
 //
 
+#define _GNU_SOURCE
 #include <getopt.h>
 #include <vector>
 #include <iostream>
@@ -23,59 +24,46 @@ using namespace std;
 
 #define print(a) cout << #a << " = " << a << endl
 
-#define execute(a) \
-    call_args[0]
-
 string so_path, base_dir;
-vector<string> call_args;
-
-void get_arguments(int argc, char **argv) {
-//    print(argc);
-
-    int c;
-    while ((c = getopt(argc, argv, "p:d:")) != -1) {
-        if (c == 'p') {
-            so_path = optarg;
-        }
-        if (c == 'd') {
-            base_dir = optarg;
-            base_dir = get_full_path(base_dir);
-        }
-    }
-
-    for(int i = optind; i < argc; i++) {
-        call_args.emplace_back(argv[i]);
-    }
-//    print_array(call_args, call_args.size());
-}
-
-static void init() __attribute__((constructor));
-
-void init() {
-    void *handle = dlopen(so_path.c_str(), RTLD_LAZY);
-    static auto a = reinterpret_cast<int (*)(const char*, mode_t)>(dlsym(handle, "mkdir"));
-//    a("a", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-}
 
 int main(int argc, char **argv) {
-    get_arguments(argc, argv);
+    so_path = "./sandbox.so";
+    base_dir = ".";
+    int c;
 
-    char *newargv[] = { "/usr/bin/mkdir a", nullptr };
-//    char *newenviron[] = { BY_LAUCHER, nullptr };
+    while ((c = getopt(argc, argv, "p:d:")) != -1) {
+        print(char(c));
+        if (c == 'p') {
+            so_path = optarg;
+        } else if (c == 'd') {
+            base_dir = optarg;
+            base_dir = get_full_path(base_dir);
+        } else {
+            fprintf(stderr, "Usage: %s [-p sopath] [-d basedir] [--] cmd [cmd args ...]\n \
+            -p: set the path to sandbox.so, default = ./sandbox.so\n\
+            -d: the base directory that is allowed to access, default = .\n\
+            --: separate the arguments for sandbox and for the executed command\n", argv[0]);
+            exit(EXIT_FAILURE);
+        }
+    }
 
-//    int fd = open("~/Desktop/test.log", O_CREAT|O_WRONLY, 0600);
-//    dup2(fd, 1);
-//    dup2(fd, 2);
-//    close(fd);
+    if (optind >= argc) {
+        fprintf(stderr, "no command given.\n");
+        exit(EXIT_FAILURE);
+    }
 
-//    extern char **environ;
-//    char **new_envp = copyenv(environ);
+    char *cmd_args[100];
+    for(int i = optind; i < argc; i++) {
+        cmd_args[i - optind] = argv[i];
+        printf("argv[%d] = %s\n", i, cmd_args[i]);
+    }
 
-//    putenv(BY_LAUCHER);
-//    execvpe("/usr/bin/mkdir", newargv, new_envp);
-//    execve("mkdir", newargv);
+    char so_path_env[sizeof("LD_PRELOAD=") + so_path.size()];
+    char base_dir_env[sizeof("BASE_DIR=") + base_dir.size()];
 
-    system("mkdir");
+    sprintf(so_path_env, "LD_PRELOAD=%s", so_path.c_str());
+    sprintf(base_dir_env, "BASE_DIR=%s", base_dir.c_str());
 
-//    execvp("mkdir", reinterpret_cast<char *const *>("a"));
+    char *envp[] = {so_path_env, base_dir_env, nullptr};
+    if (execvpe(cmd_args[0], cmd_args, envp) == -1) perror(cmd_args[0]);
 }
