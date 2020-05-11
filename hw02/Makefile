@@ -1,5 +1,5 @@
 all:
-	g++ -o sandbox -g main.cpp -ldl
-	g++ -o sandbox.so -shared -fPIC -std=c++17 sandbox.cpp utils.h -ldl
+	gcc -o sandbox -g main.c -ldl
+	gcc -o sandbox.so -shared -fPIC sandbox.c -ldl
 clean:
 	rm sandbox.so sandbox
