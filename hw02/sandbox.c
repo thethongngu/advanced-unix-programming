@@ -11,7 +11,7 @@
 #include <stdarg.h>
 #include <dirent.h>
 
-#define LibC "libc.so.6"
+#define LIB "libc.so.6"
 
 static int (*old_chdir)(const char *path) = NULL;
 static int (*old_chmod)(const char *pathname, mode_t mode) = NULL;
@@ -41,7 +41,7 @@ static int (*old_unlink)(const char *path) = NULL;
 
 #define KEEP_FUNC(name)\
     if(old_##name == NULL){\
-        void *handle = dlopen(LibC, RTLD_LAZY);\
+        void *handle = dlopen(LIB, RTLD_LAZY);\
         if(handle != NULL){\
             if ((old_##name = dlsym(handle, #name)) == NULL){\
                 fprintf(stderr, "[sandbox] " #name " failed\n");\
@@ -49,7 +49,7 @@ static int (*old_unlink)(const char *path) = NULL;
             }\
         }\
         else{\
-            fprintf(stderr, "[sandbox] cannot open %s\n", LibC);\
+            fprintf(stderr, "[sandbox] cannot open %s\n", LIB);\
             exit(EXIT_FAILURE);\
         }\
     }
@@ -73,6 +73,7 @@ static int (*old_unlink)(const char *path) = NULL;
     if(old_##name != NULL)\
         returnedValue = old_##name(param1, param2, param3, param4);\
     return returnedValue;
+
 
 bool check_path(const char *pathname){
     char *base_dir, *path;
