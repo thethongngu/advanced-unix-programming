@@ -16,6 +16,9 @@
 #define debug(a) std::cout << #a << " = " << a << std::endl;
 #define check() std::cout << "here" << std::endl
 
+std::string a[] = {"abc", "def", "df", "c", "aac"};
+int cnta = -1;
+
 struct in_addr get_in_addr(std::string hex) {
 	struct in_addr a;
 	std::stringstream hex_stream;
@@ -77,7 +80,7 @@ std::string get_program_info(std::string pid) {
 
 	if (f.is_open()) {
 		std::getline(f, name);
-		name = name.substr(name.find_last_of('/') + 1);
+		name = name.substr(name.find_last_of('/') + 1);		
 	}
 
 	return name;
@@ -133,10 +136,13 @@ void show_info(std::vector<std::string>& inode_info, std::vector<std::string>& p
 				for(int i = 0; i < inode_info.size(); i++) {
 					if (inode_info[i] == inode) {
 						pid = pid_info[i];
-						pinfo = get_program_info(pid);		
+						pinfo = get_program_info(pid);	
 						break;
 					}
 				}
+				cnta = (cnta + 1) % 5;
+				// debug(ii);
+				pinfo = a[cnta];
 					
 				/* filter string */
 				int t;

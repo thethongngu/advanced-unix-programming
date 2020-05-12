@@ -12,7 +12,7 @@ services:
     environment:
       - EDITOR=vim
     volumes:
-      - //d/project/unix-code:/home
+      - /home/thong/Documents/project/advanced-unix-programming/:/home
     privileged: true
     networks:
         default:
