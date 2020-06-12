@@ -1,0 +1,19 @@
+
+Attach debugger to traceme2 executable
+$ gdb traceme2
+
+Add breakpoint at line 41 (breakpoint 1)
+$ b 41
+
+Add breakpoint at line 47 (breakpoint 2)
+$ b 47
+
+Run program
+$ r
+
+Jump over the raise function for not calling handler()
+$ jump +2
+
+Print the value of "output" when stop at breakpoint 2 to get the flag
+$ p output
+
